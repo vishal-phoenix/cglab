@@ -1,0 +1,489 @@
+import matplotlib.pyplot as plt
+import numpy as np
+
+# -------------------- DDA ---------------------------------
+def dda_algorithm(x1, y1, x2, y2):
+    dx = x2 - x1
+    dy = y2 - y1
+    steps = abs(dx) if abs(dx) > abs(dy) else abs(dy)
+    x_increment = dx / steps
+    y_increment = dy / steps
+
+    x = x1
+    y = y1
+    points = [(round(x), round(y))]
+
+    for _ in range(steps):
+        x += x_increment
+        y += y_increment
+        points.append((round(x), round(y)))
+
+    x_values = [point[0] for point in points]
+    y_values = [point[1] for point in points]
+    plt.plot(x_values, y_values)
+
+
+# --------------------Bresenham Line--------------------------------
+
+def bresenham_algorithm(x1, y1, x2, y2):
+    dx = abs(x2 - x1)
+    dy = abs(y2 - y1)
+    steep = dy > dx
+
+    if steep:
+        x1, y1 = y1, x1
+        x2, y2 = y2, x2
+
+    if x1 > x2:
+        x1, x2 = x2, x1
+        y1, y2 = y2, y1
+
+    dx = abs(x2 - x1)
+    dy = abs(y2 - y1)
+    error = 0
+    y = y1
+    y_increment = 1 if y1 < y2 else -1
+    points = []
+
+    for x in range(x1, x2 + 1):
+        points.append((y, x) if steep else (x, y))
+        error += dy
+
+        if (error << 1) >= dx:
+            y += y_increment
+            error -= dx
+    x_values = [point[0] for point in points]
+    y_values = [point[1] for point in points]
+    plt.plot(x_values, y_values)
+
+
+# --------------------Midpoint Circle--------------------------------
+
+def midpoint_circle_algorithm(center_x, center_y, radius):
+    x = 0
+    y = radius
+    decision = 1 - radius
+    points = []
+
+    while x <= y:
+        points.append((x + center_x, y + center_y))
+        points.append((-x + center_x, y + center_y))
+        points.append((x + center_x, -y + center_y))
+        points.append((-x + center_x, -y + center_y))
+        points.append((y + center_x, x + center_y))
+        points.append((-y + center_x, x + center_y))
+        points.append((y + center_x, -x + center_y))
+        points.append((-y + center_x, -x + center_y))
+
+        if decision < 0:
+            decision += 2 * x + 3
+        else:
+            decision += 2 * (x - y) + 5
+            y -= 1
+
+        x += 1
+
+    x_values = [point[0] for point in points]
+    y_values = [point[1] for point in points]
+    plt.plot(x_values, y_values)
+
+
+# --------------------Bresenham Circle--------------------------------
+
+def bresenham_circle_algorithm(center_x, center_y, radius):
+    x = 0
+    y = radius
+    decision = 3 - 2 * radius
+    points = []
+
+    while x <= y:
+        points.append((x + center_x, y + center_y))
+        points.append((-x + center_x, y + center_y))
+        points.append((x + center_x, -y + center_y))
+        points.append((-x + center_x, -y + center_y))
+        points.append((y + center_x, x + center_y))
+        points.append((-y + center_x, x + center_y))
+        points.append((y + center_x, -x + center_y))
+        points.append((-y + center_x, -x + center_y))
+
+        if decision < 0:
+            decision += 4 * x + 6
+        else:
+            decision += 4 * (x - y) + 10
+            y -= 1
+
+        x += 1
+    
+    x_values = [point[0] for point in points]
+    y_values = [point[1] for point in points]
+    plt.scatter(x_values, y_values, c='black', marker = '.')
+
+# --------------------2D Transformation Scaling-------------------------------
+
+def scal(a,b):
+# Define the vertices of the triangle
+  triangle = np.array([[50, 100], [50, 200], [100, 100],[50,100]])
+  # Define the scaling factor for x and y
+  sx = a
+  sy = b
+  # Define the scaling matrix
+  scaling_matrix = np.array([[sx, 0], [0, sy]])
+  # Apply the scaling transformation to the triangle
+  scaled_triangle = triangle.dot(scaling_matrix)
+  # Plot the original and scaled triangles
+  # plt.subplot(121)
+  plt.title('Original Triangle')
+  plt.plot(triangle[:,0], triangle[:,1], 'b',scaled_triangle[:,0], scaled_triangle[:,1], 'r')
+  # plt.axis('equal')
+  # plt.show()
+
+# --------------------2D Transformation Rotation-------------------------------
+
+def rotat():
+  # Define the vertices of the triangle
+  triangle = np.array([[170, 175], [170, 50], [230, 50], [230, 175]])
+  # Define the rotation angle in degrees
+  theta = np.pi/2  # 90 degrees in radians
+  # Define the rotation matrix
+  rotation_matrix = np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
+  # Apply the rotation transformation to the triangle
+  rotated_triangle = triangle.dot(rotation_matrix)
+  # Plot the original and rotated triangles
+  plt.subplot(121)
+  plt.title('Original Triangle')
+  plt.plot(triangle[:,0], triangle[:,1], 'b',rotated_triangle[:,0], rotated_triangle[:,1], 'r')
+  plt.axis('equal')
+  plt.show()
+
+# --------------------2D Transformation Shearing-x -------------------------------
+
+def shearingx(a):
+  # Define the vertices of the square
+  square = np.array([[50, 100], [50, 200], [150, 200], [150, 100],[50,100]])
+  # Define the shearing factor along the x-axis
+  shx = a
+  # Define the shearing matrix
+  shearing_matrix = np.array([[1, shx],[0, 1] ])
+  # Apply the shearing transformation to the square
+  sheared_square = square.dot(shearing_matrix)
+  # Plot the original and sheared squares
+  plt.subplot(121)
+  plt.title('Original Square')
+  plt.plot(square[:,0], square[:,1], 'b')
+  plt.axis('equal')
+  plt.subplot(122)
+  plt.title('Sheared Square')
+  plt.plot(sheared_square[:,0], sheared_square[:,1], 'r')
+  plt.axis('equal')
+  plt.show()
+
+
+# --------------------2D Transformation Shearing-y -------------------------------
+
+def shearingy(a):
+  # Define the vertices of the square
+  square = np.array([[170, 175], [170, 50], [230, 50], [230, 175]])
+  # Define the shearing factor along the y-axis
+  shy = a
+  # Define the shearing matrix
+  shearing_matrix = np.array([[1, 0], [shy, 1]])
+  # Apply the shearing transformation to the square
+  sheared_square = square.dot(shearing_matrix)
+  # Plot the original and sheared squares
+  plt.subplot(121)
+  plt.title('Original Square')
+  plt.plot(square[:,0], square[:,1], 'b')
+  plt.axis('equal')
+  plt.subplot(122)
+  plt.title('Sheared Square')
+  plt.plot(sheared_square[:,0], sheared_square[:,1], 'r')
+  plt.axis('equal')
+
+  plt.show()
+
+
+# -------------------- Liang Barsky Line clipping -------------------------------
+def liangBarsky(x1, y1, x2, y2, x_min, y_min, x_max, y_max):
+    dx = x2 - x1
+    dy = y2 - y1
+    p1 = -dx
+    p2 = dx
+    p3 = -dy
+    p4 = dy
+
+    q1 = x1 - x_min
+    q2 = x_max - x1
+    q3 = y1 - y_min
+    q4 = y_max - y1
+
+    print("p1 =  %.2f, q1 =  %.2f" % (p1, q1))
+    print("p2 =  %.2f, q2 =  %.2f" % (p2, q2))
+    print("p3 =  %.2f, q3 =  %.2f" % (p3, q3))
+    print("p4 =  %.2f, q4 =  %.2f" % (p4, q4))
+    print("\n")
+
+    t1 = q1 / p1
+    t2 = q2 / p2
+    t3 = q3 / p3
+    t4 = q4 / p4
+
+    print("t1 = %.2f" % t1)
+    print("t2 = %.2f" % t2)
+    print("t3 = %.2f" % t3)
+    print("t4 = %.2f" % t4)
+    print("\n")
+
+    t_max = 0
+    t_min = 1
+
+    if p1 == 0 or p2 == 0 or p3 == 0 or p4 == 0:
+        print("line is parallel")
+        print("\n")
+
+    if p1 != 0:
+        if p1 < 0:
+            t_max = max(t_max, t1)
+        elif p1 > 0:
+            t_min = min(t_min, t1)
+
+    if p2 != 0:
+        if p2 < 0:
+            t_max = max(t_max, t2)
+        elif p2 > 0:
+            t_min = min(t_min, t2)
+
+    if p3 != 0:
+        if p3 < 0:
+            t_max = max(t_max, t3)
+        elif p3 > 0:
+            t_min = min(t_min, t3)
+
+    if p4 != 0:
+        if p4 < 0:
+            t_max = max(t_max, t4)
+        elif p4 > 0:
+            t_min = min(t_min, t4)
+
+    if t_max > t_min:
+        print("Line is completely outside")
+        print("\n")
+
+    if t_max < t_min:
+        x_1 = x1 + (t_max * dx)
+        y_1 = y1 + (t_max * dy)
+        x_2 = x1 + (t_min * dx)
+        y_2 = y1 + (t_min * dy)
+
+    print(
+        "Line will be accepted from (%.2f, %.2f) to (%.2f, %.2f)" % (
+            x_1, y_1, x_2, y_2)
+    )
+    plt.plot([x1, x2], [y1, y2], "--bo")
+    plt.plot([x_1, x_2], [y_1, y_2], "-ro")
+    plt.plot([x_min, x_min], [y_min, y_max], "go", linestyle="--")  # left
+    plt.plot([x_min, x_max], [y_min, y_min], "go", linestyle="--")  # bottom
+    plt.plot([x_min, x_max], [y_max, y_max], "go", linestyle="--")  # top
+    plt.plot([x_max, x_max], [y_max, y_min], "go", linestyle="--")  # right
+    plt.show()
+
+
+# -------------------- Suttherland Polygon clipping -------------------------------
+
+print("Enter Clipping Region")
+x_min = int(input("x_min: "))
+y_min = int(input("y_min: "))
+x_max = int(input("x_max: "))
+y_max = int(input("y_max: "))
+print("\n")
+
+
+def sutherland_hodgman_clip(subject_polygon, clip_polygon):
+    def inside(p):
+        return (cp2[0] - cp1[0]) * (p[1] - cp1[1]) > (cp2[1] - cp1[1]) * (p[0] - cp1[0])
+
+    def compute_intersection():
+        dc = [cp1[0] - cp2[0], cp1[1] - cp2[1]]
+        dp = [s[0] - e[0], s[1] - e[1]]
+        n1 = cp1[0] * cp2[1] - cp1[1] * cp2[0]
+        n2 = s[0] * e[1] - s[1] * e[0]
+        n3 = 1.0 / (dc[0] * dp[1] - dc[1] * dp[0])
+        return [(n1 * dp[0] - n2 * dc[0]) * n3, (n1 * dp[1] - n2 * dc[1]) * n3]
+
+    output_list = subject_polygon
+    cp1 = clip_polygon[-1]
+
+    for cp2 in clip_polygon:
+        input_list = output_list
+        output_list = []
+        s = input_list[-1]
+
+        for e in input_list:
+            if inside(e):
+                if not inside(s):
+                    output_list.append(compute_intersection())
+                output_list.append(e)
+            elif inside(s):
+                output_list.append(compute_intersection())
+            s = e
+        cp1 = cp2
+    return output_list
+
+
+subject_polygon = []
+for i in range(5):
+    x = input("Enter x and y: ").split()
+    subject_polygon.append((int(x[0]), int(x[1])))
+
+clip_polygon = [(x_min, y_min), (x_max, y_min), (x_max, y_max), (x_min, y_max)]
+
+clipped_polygon = sutherland_hodgman_clip(subject_polygon, clip_polygon)
+print(clipped_polygon)
+
+
+x, y = zip(*clipped_polygon)
+
+fig, ax = plt.subplots()
+
+ax.plot(*zip(*subject_polygon), color="blue", label="Input polygon")
+ax.plot(x, y, color="red", label="Clipped polygon")
+
+plt.plot([x_min, x_min], [y_min, y_max], "go", linestyle="--")
+plt.plot([x_min, x_max], [y_min, y_min], "go", linestyle="--")
+plt.plot([x_min, x_max], [y_max, y_max], "go", linestyle="--")
+plt.plot([x_max, x_max], [y_max, y_min], "go", linestyle="--")
+
+ax.legend()
+ax.set_title("Sutherland-Hodgman clipping algorithm")
+
+plt.show()
+
+# ------------------- Cohen Sutherland line clipping -----------------------
+
+def cohen_sutherland(x1, y1, x2, y2, xmin, ymin, xmax, ymax):
+    INSIDE = 0  # 0000
+    LEFT = 1  # 0001
+    RIGHT = 2  # 0010
+    BOTTOM = 4  # 0100
+    TOP = 8  # 1000
+    code1 = computeCode(x1, y1, xmin, ymin, xmax, ymax)
+    code2 = computeCode(x2, y2, xmin, ymin, xmax, ymax)
+    accept = False
+
+    while True:
+
+        # If both endpoints lie within rectangle
+        if code1 == 0 and code2 == 0:
+            accept = True
+            break
+
+        # If both endpoints are outside rectangle
+        elif (code1 & code2) != 0:
+            break
+
+        # Some segment lies within the rectangle
+        else:
+            x = 1.0
+            y = 1.0
+            if code1 != 0:
+                code_out = code1
+            else:
+                code_out = code2
+            if code_out & TOP:
+                x = x1 + (x2 - x1) * (ymax - y1) / (y2 - y1)
+                y = ymax
+
+            elif code_out & BOTTOM:
+                x = x1 + (x2 - x1) * (ymin - y1) / (y2 - y1)
+                y = ymin
+
+            elif code_out & RIGHT:
+                y = y1 + (y2 - y1) * (xmax - x1) / (x2 - x1)
+                x = xmax
+
+            elif code_out & LEFT:
+                y = y1 + (y2 - y1) * (xmin - x1) / (x2 - x1)
+                x = xmin
+
+            if code_out == code1:
+                x1 = x
+                y1 = y
+                code1 = computeCode(x1, y1, xmin, ymin, xmax, ymax)
+
+            else:
+                x2 = x
+                y2 = y
+                code2 = computeCode(x2, y2, xmin, ymin, xmax, ymax)
+
+    if accept:
+        print("Line accepted from %.2f, %.2f to %.2f, %.2f" % (x1, y1, x2, y2))
+        xpoints = np.array([x1, x2])
+        ypoints = np.array([y1, y2])
+        plt.plot(xpoints, ypoints, "k")
+        plt.axis("scaled")
+        plt.show()
+    else:
+        print("Line rejected")
+
+
+def computeCode(x, y, xmin, ymin, xmax, ymax):
+    code = 0
+    if x < xmin:
+        code = code | 1
+    if x > xmax:
+        code = code | 2
+    if y < ymin:
+        code = code | 4
+    if y > ymax:
+        code = code | 8
+    return code
+
+
+xmin, xmax, ymin, ymax = map(int, input("Enter xmin, xmax, ymin, ymax: ").split())
+plt.plot([xmin, xmax], [ymin, ymin], "k")
+plt.plot([xmax, xmax], [ymin, ymax], "k")
+plt.plot([xmax, xmin], [ymax, ymax], "k")
+plt.plot([xmin, xmin], [ymax, ymin], "k")
+x1, y1, x2, y2 = map(int, input("Enter x1, y1, x2, y2 (End points of line): ").split())
+plt.plot([x1, x2], [y1, y2], linestyle="dotted")
+cohen_sutherland(x1, y1, x2, y2, xmin, ymin, xmax, ymax)
+
+#---------------------Point Clipping -------------------------------------------
+def pointClip(x, y, xmin, ymin, xmax, ymax):
+    if x < xmin or x > xmax or y < ymin or y > ymax:
+        return False
+    else:
+        return True
+
+
+xmin, xmax, ymin, ymax = map(int, input("Enter xmin, xmax, ymin, ymax: ").split())
+plt.plot([xmin, xmax], [ymin, ymin], "k")
+plt.plot([xmax, xmax], [ymin, ymax], "k")
+plt.plot([xmax, xmin], [ymax, ymax], "k")
+plt.plot([xmin, xmin], [ymax, ymin], "k")
+n = int(input("Enter number of points: "))
+for i in range(n):
+    x, y = map(int, input("Enter x, y: ").split())
+    if pointClip(x, y, xmin, ymin, xmax, ymax):
+        print("Point is inside the window")
+        plt.plot(x, y, ".k")
+        plt.text(x, y, "({}, {})".format(x, y))
+    else:
+        print("Point is outside the window")
+        plt.plot(x, y, 'x')
+        plt.text(x, y, "({}, {})".format(x, y))
+plt.axis("scaled")
+plt.show()
+
+# -----------------Rocket------------------------
+# bresenham_algorithm(20, 70, 40, 100)
+# bresenham_algorithm(40, 100, 60, 70)
+# bresenham_algorithm(20, 70, 60, 70)
+# bresenham_algorithm(20, 0, 20, 70)
+# bresenham_algorithm(60, 0, 60, 70)
+# bresenham_algorithm(0, 10, 80, 10)
+# bresenham_algorithm(0, 10, 20, 40)
+# dda_algorithm(60, 40, 80, 10)
+# bresenham_circle_algorithm(40,80,6)
+# plt.axis('equal')
+# plt.show()
+
